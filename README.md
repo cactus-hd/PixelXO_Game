@@ -25,7 +25,7 @@ A beautifully designed, modern, and interactive **Tic-Tac-Toe** Android applicat
 - **Design System**: Material 3
 - **Navigation**: Navigation Compose
 - **Data Persistence**: SharedPreferences (JSON formatting)
-- **Typography**: Vazirmatn Font Family
+- **Typography**: Google sans Font Family
 
 ---
 
