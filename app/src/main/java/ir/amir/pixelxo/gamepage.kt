@@ -1,10 +1,7 @@
 package ir.amir.pixelxo
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,8 +35,8 @@ fun gamepage(
     playertwo: String,
     navController: NavController
 ) {
-    val vazirmatnRegular = FontFamily(Font(R.font.vazirmatn_regular))
-    val vazirmatnBold = FontFamily(Font(R.font.vazirmatn_bold))
+    val googleSansRegular = FontFamily(Font(R.font.googlesans_reg))
+    val googleSansBold = FontFamily(Font(R.font.googlesans_bold))
     val context = LocalContext.current
 
     var player1Score by remember { mutableIntStateOf(0) }
@@ -50,10 +47,12 @@ fun gamepage(
     val board = remember { mutableStateListOf("", "", "", "", "", "", "", "", "") }
 
     var isRoundOver by remember { mutableStateOf(false) }
-    var roundWinner by remember { mutableStateOf<String?>(null) } // "O", "X", or null (draw)
+    var roundWinner by remember { mutableStateOf<String?>(null) }
+    var winningCombo by remember { mutableStateOf<List<Int>?>(null) }
     var showEndDialog by remember { mutableStateOf(false) }
+    var showExitDialog by remember { mutableStateOf(false) }
 
-    fun checkWinner(b: List<String>): String? {
+    fun checkWinningCombo(b: List<String>): List<Int>? {
         val winCombos = listOf(
             listOf(0, 1, 2), listOf(3, 4, 5), listOf(6, 7, 8),
             listOf(0, 3, 6), listOf(1, 4, 7), listOf(2, 5, 8),
@@ -64,7 +63,7 @@ fun gamepage(
             val cellB = b[combo[1]]
             val cellC = b[combo[2]]
             if (cellA.isNotEmpty() && cellA == cellB && cellB == cellC) {
-                return cellA
+                return combo
             }
         }
         return null
@@ -92,6 +91,7 @@ fun gamepage(
             }
             isRoundOver = false
             roundWinner = null
+            winningCombo = null
             isPlayer1Turn = (currentRound % 2 != 0)
         }
     }
@@ -105,11 +105,12 @@ fun gamepage(
         }
         isRoundOver = false
         roundWinner = null
+        winningCombo = null
         showEndDialog = false
         isPlayer1Turn = true
     }
 
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Surface(
             modifier = modifier.fillMaxSize(),
             color = Color(0xFFF2F3F9)
@@ -120,9 +121,41 @@ fun gamepage(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { showExitDialog = true }
+                            .padding(8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "←",
+                            color = PurpleBackground,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
 
-                // Score Card
+                    Text(
+                        text = "PixelXO",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1A202C),
+                        fontFamily = googleSansBold
+                    )
+
+                    Spacer(modifier = Modifier.width(32.dp))
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
@@ -134,19 +167,19 @@ fun gamepage(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 16.dp, horizontal = 16.dp),
+                            .padding(vertical = 14.dp, horizontal = 12.dp),
                         horizontalArrangement = Arrangement.SpaceAround,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Player 1 (O - playerone)
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(if (isPlayer1Turn && !isRoundOver) Color(0xFFE0F3F1) else Color.Transparent)
-                                .padding(horizontal = 24.dp, vertical = 12.dp),
-                            contentAlignment = Alignment.Center
+                        val p1Active = isPlayer1Turn && !isRoundOver
+                        Surface(
+                            shape = RoundedCornerShape(16.dp),
+                            color = if (p1Active) Color(0xFFE0F3F1) else Color.Transparent,
+                            border = if (p1Active) BorderStroke(1.5.dp, GreenO) else null,
+                            modifier = Modifier.clip(RoundedCornerShape(16.dp))
                         ) {
                             Column(
+                                modifier = Modifier.padding(horizontal = 22.dp, vertical = 10.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
@@ -154,14 +187,14 @@ fun gamepage(
                                     color = GreenO,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
-                                    fontFamily = vazirmatnBold
+                                    fontFamily = googleSansBold
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = playerone,
                                     color = Color(0xFF2D3748),
                                     fontSize = 14.sp,
-                                    fontFamily = vazirmatnRegular
+                                    fontFamily = googleSansRegular
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
@@ -169,28 +202,27 @@ fun gamepage(
                                     color = GreenO,
                                     fontSize = 22.sp,
                                     fontWeight = FontWeight.Bold,
-                                    fontFamily = vazirmatnBold
+                                    fontFamily = googleSansBold
                                 )
                             }
                         }
 
-                        // Separator
                         Text(
                             text = "—",
                             color = Color(0xFFA0AEC0),
                             fontSize = 20.sp,
-                            fontFamily = vazirmatnRegular
+                            fontFamily = googleSansRegular
                         )
 
-                        // Player 2 (X - playertwo)
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(if (!isPlayer1Turn && !isRoundOver) Color(0xFFFFEBEE) else Color.Transparent)
-                                .padding(horizontal = 24.dp, vertical = 12.dp),
-                            contentAlignment = Alignment.Center
+                        val p2Active = !isPlayer1Turn && !isRoundOver
+                        Surface(
+                            shape = RoundedCornerShape(16.dp),
+                            color = if (p2Active) Color(0xFFFFEBEE) else Color.Transparent,
+                            border = if (p2Active) BorderStroke(1.5.dp, RedX) else null,
+                            modifier = Modifier.clip(RoundedCornerShape(16.dp))
                         ) {
                             Column(
+                                modifier = Modifier.padding(horizontal = 22.dp, vertical = 10.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
@@ -198,14 +230,14 @@ fun gamepage(
                                     color = RedX,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
-                                    fontFamily = vazirmatnBold
+                                    fontFamily = googleSansBold
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = playertwo,
                                     color = Color(0xFF2D3748),
                                     fontSize = 14.sp,
-                                    fontFamily = vazirmatnRegular
+                                    fontFamily = googleSansRegular
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
@@ -213,22 +245,21 @@ fun gamepage(
                                     color = RedX,
                                     fontSize = 22.sp,
                                     fontWeight = FontWeight.Bold,
-                                    fontFamily = vazirmatnBold
+                                    fontFamily = googleSansBold
                                 )
                             }
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                // Round and Turn Info
                 Text(
-                    text = "دست $currentRound از 5",
+                    text = "Round $currentRound of 5",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF4A5568),
-                    fontFamily = vazirmatnBold
+                    fontFamily = googleSansBold
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
@@ -237,23 +268,22 @@ fun gamepage(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "نوبت: ",
+                        text = "Turn: ",
                         fontSize = 15.sp,
                         color = Color(0xFF4A5568),
-                        fontFamily = vazirmatnRegular
+                        fontFamily = googleSansRegular
                     )
                     Text(
                         text = if (isPlayer1Turn) playerone else playertwo,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = if (isPlayer1Turn) GreenO else RedX,
-                        fontFamily = vazirmatnBold
+                        fontFamily = googleSansBold
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                // Tic-Tac-Toe Grid Card
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(24.dp),
@@ -278,24 +308,29 @@ fun gamepage(
                                     val index = row * 3 + col
                                     val cellValue = board[index]
 
-                                    val cellBg = when (cellValue) {
-                                        "O" -> Color(0xFFFFCA28)
-                                        "X" -> RedX
+                                    val isWinningCell = winningCombo?.contains(index) == true
+
+                                    val cellBg = when {
+                                        cellValue == "O" -> Color(0xFFFFCA28)
+                                        cellValue == "X" -> RedX
                                         else -> Color(0xFFF4F5FB)
                                     }
 
-                                    Box(
+                                    Surface(
+                                        shape = RoundedCornerShape(16.dp),
+                                        color = cellBg,
+                                        border = if (isWinningCell) BorderStroke(3.dp, Color(0xFF4A43C6)) else null,
                                         modifier = Modifier
                                             .weight(1f)
                                             .aspectRatio(1f)
-                                            .clip(RoundedCornerShape(16.dp))
-                                            .background(cellBg)
                                             .clickable {
                                                 if (cellValue.isEmpty() && !isRoundOver && !showEndDialog) {
                                                     board[index] = if (isPlayer1Turn) "O" else "X"
-                                                    val winner = checkWinner(board)
-                                                    if (winner != null) {
+                                                    val combo = checkWinningCombo(board)
+                                                    if (combo != null) {
                                                         isRoundOver = true
+                                                        winningCombo = combo
+                                                        val winner = board[combo[0]]
                                                         roundWinner = winner
                                                         if (winner == "O") {
                                                             player1Score++
@@ -309,17 +344,18 @@ fun gamepage(
                                                         isPlayer1Turn = !isPlayer1Turn
                                                     }
                                                 }
-                                            },
-                                        contentAlignment = Alignment.Center
+                                            }
                                     ) {
-                                        if (cellValue.isNotEmpty()) {
-                                            Text(
-                                                text = cellValue,
-                                                fontSize = 40.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                color = Color.White,
-                                                fontFamily = vazirmatnBold
-                                            )
+                                        Box(contentAlignment = Alignment.Center) {
+                                            if (cellValue.isNotEmpty()) {
+                                                Text(
+                                                    text = cellValue,
+                                                    fontSize = 40.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = Color.White,
+                                                    fontFamily = googleSansBold
+                                                )
+                                            }
                                         }
                                     }
                                 }
@@ -328,18 +364,17 @@ fun gamepage(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                // Bottom Banner when round is over
                 AnimatedVisibility(
                     visible = isRoundOver && !showEndDialog,
-                    enter = fadeIn(),
+                    enter = fadeIn() + scaleIn(),
                     exit = fadeOut()
                 ) {
                     val bannerText = when (roundWinner) {
-                        "O" -> "🎉 $playerone برنده این دست شد!"
-                        "X" -> "🎉 $playertwo برنده این دست شد!"
-                        else -> "🎉 این دست مساوی شد!"
+                        "O" -> "🎉 $playerone won this round!"
+                        "X" -> "🎉 $playertwo won this round!"
+                        else -> "🤝 Round tied!"
                     }
 
                     Button(
@@ -355,17 +390,51 @@ fun gamepage(
                             color = Color.White,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
-                            fontFamily = vazirmatnBold
+                            fontFamily = googleSansBold
                         )
                     }
                 }
             }
         }
 
-        // End Game Dialog
+        if (showExitDialog) {
+            AlertDialog(
+                onDismissRequest = { showExitDialog = false },
+                title = {
+                    Text(
+                        text = "Exit Game",
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = googleSansBold
+                    )
+                },
+                text = {
+                    Text(
+                        text = "Are you sure you want to exit the game? Match progress will be lost.",
+                        fontFamily = googleSansRegular
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            showExitDialog = false
+                            navController.popBackStack()
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63946))
+                    ) {
+                        Text("Exit", fontFamily = googleSansBold)
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(onClick = { showExitDialog = false }) {
+                        Text("Resume", fontFamily = googleSansRegular)
+                    }
+                }
+            )
+        }
+
         if (showEndDialog) {
             Dialog(onDismissRequest = { }) {
-                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -381,29 +450,29 @@ fun gamepage(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "پایان بازی",
+                                text = "🏆 Game Over 🏆",
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF1A202C),
-                                fontFamily = vazirmatnBold
+                                fontFamily = googleSansBold
                             )
 
                             Spacer(modifier = Modifier.height(12.dp))
 
                             Text(
-                                text = "$playertwo $player2Score — $player1Score $playerone",
+                                text = "$playerone $player1Score — $player2Score $playertwo",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF2D3748),
-                                fontFamily = vazirmatnBold
+                                fontFamily = googleSansBold
                             )
 
                             Spacer(modifier = Modifier.height(8.dp))
 
                             val matchWinnerText = when {
-                                player1Score > player2Score -> "$playerone برنده شد!"
-                                player2Score > player1Score -> "$playertwo برنده شد!"
-                                else -> "بازی مساوی شد!"
+                                player1Score > player2Score -> "🎉 $playerone Won!"
+                                player2Score > player1Score -> "🎉 $playertwo Won!"
+                                else -> "🤝 Game Tied!"
                             }
 
                             Text(
@@ -411,7 +480,7 @@ fun gamepage(
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF4A5568),
-                                fontFamily = vazirmatnBold
+                                fontFamily = googleSansBold
                             )
 
                             Spacer(modifier = Modifier.height(24.dp))
@@ -433,10 +502,10 @@ fun gamepage(
                                     shape = RoundedCornerShape(12.dp)
                                 ) {
                                     Text(
-                                        text = "جدول امتیازات",
+                                        text = "Scoreboard",
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.Bold,
-                                        fontFamily = vazirmatnBold
+                                        fontFamily = googleSansBold
                                     )
                                 }
 
@@ -449,10 +518,10 @@ fun gamepage(
                                     shape = RoundedCornerShape(12.dp)
                                 ) {
                                     Text(
-                                        text = "بازی دوباره",
+                                        text = "Play Again",
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.Bold,
-                                        fontFamily = vazirmatnBold
+                                        fontFamily = googleSansBold
                                     )
                                 }
                             }

@@ -84,22 +84,32 @@ object ScoreManager {
         }
         return list
     }
+
+    fun clearHistory(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().remove(KEY_HISTORY).apply()
+    }
 }
 
 @Composable
 fun ScoretableScreen(navController: NavController, modifier: Modifier = Modifier) {
-    val vazirmatnRegular = FontFamily(Font(R.font.vazirmatn_regular))
-    val vazirmatnBold = FontFamily(Font(R.font.vazirmatn_bold))
+    val googleSansRegular = FontFamily(Font(R.font.googlesans_reg))
+    val googleSansBold = FontFamily(Font(R.font.googlesans_bold))
     val context = LocalContext.current
 
     val history = remember { mutableStateListOf<MatchRecord>() }
+    var showClearDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
+    fun refreshHistory() {
         history.clear()
         history.addAll(ScoreManager.getMatchHistory(context))
     }
 
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+    LaunchedEffect(Unit) {
+        refreshHistory()
+    }
+
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Surface(
             modifier = modifier.fillMaxSize(),
             color = Color(0xFFF2F3F9)
@@ -116,31 +126,45 @@ fun ScoretableScreen(navController: NavController, modifier: Modifier = Modifier
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = "جدول امتیازات",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1A202C),
-                        fontFamily = vazirmatnBold
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable { navController.popBackStack() }
-                            .padding(8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable { navController.popBackStack() }
+                                .padding(8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "←",
+                                color = PurpleBackground,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "➔",
-                            color = PurpleBackground,
+                            text = "Scoreboard",
                             fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1A202C),
+                            fontFamily = googleSansBold
                         )
+                    }
+
+                    if (history.isNotEmpty()) {
+                        TextButton(onClick = { showClearDialog = true }) {
+                            Text(
+                                text = "Clear",
+                                color = Color(0xFFE63946),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = googleSansBold
+                            )
+                        }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 if (history.isEmpty()) {
                     Box(
@@ -148,20 +172,55 @@ fun ScoretableScreen(navController: NavController, modifier: Modifier = Modifier
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "هنوز بازی‌ای انجام نشده",
+                            text = "No games played yet",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color(0xFF718096),
-                            fontFamily = vazirmatnRegular
+                            fontFamily = googleSansRegular
                         )
                     }
                 } else {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = PurpleBackground),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = "Total Games",
+                                    color = Color.White.copy(alpha = 0.8f),
+                                    fontSize = 13.sp,
+                                    fontFamily = googleSansRegular
+                                )
+                                Text(
+                                    text = history.size.toString(),
+                                    color = Color.White,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = googleSansBold
+                                )
+                            }
+                        }
+                    }
+
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         itemsIndexed(history) { index, item ->
                             val isLatest = index == 0
+                            val p1Winner = item.player1Score > item.player2Score
+                            val p2Winner = item.player2Score > item.player1Score
 
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
@@ -183,13 +242,18 @@ fun ScoretableScreen(navController: NavController, modifier: Modifier = Modifier
                                         horizontalArrangement = Arrangement.SpaceAround,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(
-                                            text = item.player1Name,
-                                            fontSize = 18.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color(0xFF2D3748),
-                                            fontFamily = vazirmatnBold
-                                        )
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            if (p1Winner) {
+                                                Text(text = "👑 ", fontSize = 16.sp)
+                                            }
+                                            Text(
+                                                text = item.player1Name,
+                                                fontSize = 18.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = Color(0xFF2D3748),
+                                                fontFamily = googleSansBold
+                                            )
+                                        }
 
                                         Box(
                                             modifier = Modifier
@@ -205,17 +269,22 @@ fun ScoretableScreen(navController: NavController, modifier: Modifier = Modifier
                                                 color = Color.White,
                                                 fontSize = 18.sp,
                                                 fontWeight = FontWeight.Bold,
-                                                fontFamily = vazirmatnBold
+                                                fontFamily = googleSansBold
                                             )
                                         }
 
-                                        Text(
-                                            text = item.player2Name,
-                                            fontSize = 18.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color(0xFF2D3748),
-                                            fontFamily = vazirmatnBold
-                                        )
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(
+                                                text = item.player2Name,
+                                                fontSize = 18.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = Color(0xFF2D3748),
+                                                fontFamily = googleSansBold
+                                            )
+                                            if (p2Winner) {
+                                                Text(text = " 👑", fontSize = 16.sp)
+                                            }
+                                        }
                                     }
 
                                     Spacer(modifier = Modifier.height(8.dp))
@@ -224,7 +293,7 @@ fun ScoretableScreen(navController: NavController, modifier: Modifier = Modifier
                                         text = item.dateTime,
                                         fontSize = 12.sp,
                                         color = Color(0xFFA0AEC0),
-                                        fontFamily = vazirmatnRegular
+                                        fontFamily = googleSansRegular
                                     )
                                 }
                             }
@@ -232,6 +301,42 @@ fun ScoretableScreen(navController: NavController, modifier: Modifier = Modifier
                     }
                 }
             }
+        }
+
+        if (showClearDialog) {
+            AlertDialog(
+                onDismissRequest = { showClearDialog = false },
+                title = {
+                    Text(
+                        text = "Clear History",
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = googleSansBold
+                    )
+                },
+                text = {
+                    Text(
+                        text = "Are you sure you want to delete all match history?",
+                        fontFamily = googleSansRegular
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            ScoreManager.clearHistory(context)
+                            refreshHistory()
+                            showClearDialog = false
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE63946))
+                    ) {
+                        Text("Clear", fontFamily = googleSansBold)
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(onClick = { showClearDialog = false }) {
+                        Text("Cancel", fontFamily = googleSansRegular)
+                    }
+                }
+            )
         }
     }
 }
