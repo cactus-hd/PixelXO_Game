@@ -1,41 +1,52 @@
-# 🎮 PixelXO - بازی دوز مدرن 
+# 🎮 PixelXO - Modern Tic-Tac-Toe
 
-یک اپلیکیشن زیبا، مدرن و تعاملی برای بازی **دوز دو نفره (Tic-Tac-Toe)** که با استفاده از **Jetpack Compose** و **Material 3** برای سیستم‌عامل اندروید توسعه داده شده است.
+A beautifully designed, modern, and interactive **Tic-Tac-Toe** Android application built with **Jetpack Compose** and **Material 3**.
 
----
-
-## 🌟 ویژگی‌های برجسته (Key Features)
-
-- 👥 **بازی دو نفره (۵ دسته)**: رقابت جذاب بین دو بازیکن در ۵ دست همراه با محاسبه خودکار امتیازات.
-- 🎨 **رابط کاربری مدرن (Material 3 UI)**: استفاده از گریدینت‌های رنگی جذاب، انیمیشن‌های روان و کارت‌های برجسته.
-- 📊 **جدول امتیازات و تاریخچه (Scoreboard)**: ذخیره‌سازی دائمی تاریخچه مسابقات با `SharedPreferences` همراه با نمایش تاریخ، زمان و امتیازات.
-- 👑 **هایلایت هوشمند برنده**: نمایش خط برنده، هایلایت خانه‌های برنده و آیکون تاج 👑 برای برنده نهایی مسابقات.
-- 🇮🇷 **پشتیبانی کامل از راست‌چین (RTL Support)**: طراحی کاملاً بهینه‌شده برای زبان فارسی همراه با فونت زیبای **وزیرمتن (Vazirmatn)**.
-- 🗑️ **مدیریت تاریخچه**: قابلیت پاک‌سازی کامل تاریخچه بازی‌ها با تاییدیه کاربر.
+[![Android](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com/)
+[![Kotlin](https://img.shields.io/badge/Language-Kotlin-purple.svg)](https://kotlinlang.org/)
+[![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-blue.svg)](https://developer.android.com/jetpack/compose)
 
 ---
 
-## 🛠️ تکنولوژی‌های استفاده‌شده (Tech Stack)
+## ✨ Features
 
-- **زبان برنامه نویسی**: Kotlin
-- **رابط کاربری (UI Framework)**: Jetpack Compose
-- **دیزاین سیستم**: Material 3
-- **مسیریابی (Navigation)**: Navigation Compose
-- **ذخیره‌سازی اطلاعات**: SharedPreferences (فرمت JSON)
-- **فونت**: Vazirmatn Font Family
+- 👥 **2-Player Local Gameplay (5 Rounds)**: Enjoy a multi-round competitive match (best of 5) with automatic score accumulation.
+- 🎨 **Modern Material 3 UI**: Clean gradients, fluid animations, elevated cards, and smooth user experience.
+- 📊 **Match History & Scoreboard**: Persistent match history saved using `SharedPreferences` with date, time, and score breakdown.
+- 👑 **Winner Highlights & Visuals**: Visual highlights for the 3 winning cells, round completion banners, and winner crowns 👑.
+- 🌐 **RTL & Custom Typography**: Fully optimized for RTL layout direction with custom **Vazirmatn** typography.
+- 🗑️ **History Management**: Clear match records anytime with a quick confirmation dialog.
 
 ---
 
-## 🚀 نحوه اجرا (How to Run)
+## 🛠️ Tech Stack
 
-1. این مخزن را کلون کنید یا فایل پروژه‌ها را دانلود کنید:
+- **Language**: [Kotlin](https://kotlinlang.org/)
+- **UI Toolkit**: [Jetpack Compose](https://developer.android.com/jetpack/compose)
+- **Design System**: Material 3
+- **Navigation**: Navigation Compose
+- **Data Persistence**: SharedPreferences (JSON formatting)
+- **Typography**: Vazirmatn Font Family
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Android Studio Ladybug (or newer)
+- Android SDK 33+
+
+### Installation & Run
+
+1. Clone the repository:
    ```bash
-   git clone https://github.com/username/PixelXO.git
+   git clone https://github.com/your-username/PixelXO.git
    ```
-2. پروژه را در **Android Studio** باز کنید.
-3. پروژه را Sync کرده و روی یک دستگاه فیزیکی یا امولاتور اجرا کنید (حداقل اندروید نسخه 13 - API 33).
+2. Open the project in **Android Studio**.
+3. Sync Gradle and run the app on an Android emulator or physical device.
 
 ---
 
-## 📄 لیسانس (License)
-این پروژه جهت استفاده آموزشی و شخصی آزاد است.
+## 📄 License
+
+This project is open-source and available under the [MIT License](LICENSE).
