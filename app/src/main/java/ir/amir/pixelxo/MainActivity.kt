@@ -40,11 +40,8 @@ class MainActivity : ComponentActivity() {
 fun MyNav(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     NavHost(
-        navController = navController, startDestination = "mainpage", modifier = modifier,
-
-
+        navController = navController, startDestination = "mainpage", modifier = modifier
     ) {
-
         composable("mainpage") {
             Mainpage(navController = navController)
         }
@@ -52,16 +49,21 @@ fun MyNav(modifier: Modifier = Modifier) {
         composable(
             "gamepage/{player1Name}/{player2Name}",
             arguments = listOf(
-                navArgument("player1Name"){type= NavType.StringType},
-                navArgument("player2Name"){type= NavType.StringType}
+                navArgument("player1Name") { type = NavType.StringType },
+                navArgument("player2Name") { type = NavType.StringType }
             )
         ) {
-            val playerone = it.arguments?.getString("player1Name")
-            val playertwo = it.arguments?.getString("player2Name")
+            val playerone = it.arguments?.getString("player1Name") ?: ""
+            val playertwo = it.arguments?.getString("player2Name") ?: ""
             gamepage(
-                playerone = playerone!!,
-                playertwo = playertwo!!
+                playerone = playerone,
+                playertwo = playertwo,
+                navController = navController
             )
+        }
+
+        composable("scoretable") {
+            ScoretableScreen(navController = navController)
         }
     }
 }

@@ -110,7 +110,7 @@ fun Mainpage(modifier: Modifier = Modifier,navController: NavController) {
                         OutlinedTextField(
                             value = player2Name,
                             onValueChange = { player2Name = it },
-                            placeholder = {Text("نام بازیکن اول")},
+                            placeholder = {Text("نام بازیکن دوم")},
                             trailingIcon = {
                                 Text("X", color = RedX, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                             },
@@ -184,7 +184,7 @@ fun Mainpage(modifier: Modifier = Modifier,navController: NavController) {
 
 
                         OutlinedButton(
-                            onClick = {  },
+                            onClick = { navController.navigate("scoretable") },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(46.dp),
