@@ -14,7 +14,6 @@ A beautifully designed, modern, and interactive **Tic-Tac-Toe** Android applicat
 - 🎨 **Modern Material 3 UI**: Clean gradients, fluid animations, elevated cards, and smooth user experience.
 - 📊 **Match History & Scoreboard**: Persistent match history saved using `SharedPreferences` with date, time, and score breakdown.
 - 👑 **Winner Highlights & Visuals**: Visual highlights for the 3 winning cells, round completion banners, and winner crowns 👑.
-- **History Management**: 
 
 ---
 
